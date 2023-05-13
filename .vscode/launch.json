@@ -1,0 +1,11 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug OS",
+            "type": "f5anything",
+            "request": "launch",
+            "command": "${workspaceFolder}/build.bat",
+        }
+    ]
+}
