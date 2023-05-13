@@ -2,5 +2,10 @@
 An all new OS, entirely made from the ground up.
 
 ## Build Requirements
-I build this OS in windows 11 using the following software. This should all be provided within the `bin` folder
+To build the Operating system you will need to meet the following requirement;
+### Hardware requirements
+ - Windows 10 x64 or later
+### Software Requirements
  - NASM 2.16.01
+ - QEMU 8.0.0
+ - MinGW-w64 11.2.0
