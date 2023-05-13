@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./docs/images/Aura OS.png" width="400px">
+<img src="https://raw.githubusercontent.com/Aurora-softwares/Aura-OS/main/docs/images/aura.png" width="400px">
 
 **An all new OS, entirely made from the ground up.**
 
