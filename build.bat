@@ -3,6 +3,8 @@ cls
 setlocal enabledelayedexpansion
 
 REM VARIABLES
+	: Script arguments
+		set no_compile=
 	: Basic OS info
 		set os_name=Aura-OS
 		set os_version=0.0.1
@@ -14,7 +16,7 @@ REM VARIABLES
 	: File names
 		set kernel_src=%dir_src%kernel.c
 		set kernel_out=%dir_out%kernel.bin
-		set bootloader_src=%dir_src%bootloader.asm
+		set bootloader_src=%dir_src%bootloader.c
 		set bootloader_out=%dir_out%bootloader.bin
 		set os_image=%dir_iso%%os_name%-%os_version%.bin
 	: MISC
@@ -25,7 +27,7 @@ REM VARIABLES
 		set kernel-s2=NULL
 		set combine-s1=NULL
 		set boot-s1=NULL
-	goto main
+	goto parse_args
 REM FUNCTIONS
 	:generate_string
 		set "letters=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
@@ -61,7 +63,7 @@ REM FUNCTIONS
 		copy /b %1+%2 %3
 		exit /B 0
 	:boot
-		.\bin\qemu-8.0.0\qemu-system-x86_64.exe -drive format=raw,file=%1
+		.\bin\qemu-8.0.0\qemu-system-x86_64.exe -drive format=raw,file=%1 -boot c -m 64M
 		exit /B 0
 	:log
 		for /f "skip=1 delims=" %%d in ('wmic os get localdatetime') do set datetime=%%d
@@ -83,14 +85,23 @@ REM FUNCTIONS
 		)
 		exit /B 0
 REM PROGRAM
+	:parse_args
+		if "%1"=="" goto main
+		if "%1"=="--no-compile" set no_compile=1
+		shift
+		goto parse_args
 	:main
-		call :log 3 "Compiling the bootloader."
-		call :compile_c %bootloader_out% %bootloader_src%
-		call :log 3 "Compiling the kernel."
-		call :compile_c %kernel_out% %kernel_src%
-		call :log 3 "Combining the bootloader and Kernel bin files."
-		call :combine_bin %bootloader_out% %kernel_out% %os_image%
-		call :log 3 "Booting OS with NASM."
+		if not defined no_compile (
+			call :log 3 "Compiling the bootloader."
+			call :compile_c %bootloader_out% %bootloader_src%
+			call :log 3 "Compiling the kernel."
+			call :compile_c %kernel_out% %kernel_src%
+			call :log 3 "Combining the bootloader and Kernel bin files."
+			call :combine_bin %bootloader_out% %kernel_out% %os_image%
+		) else (
+			call :log 3 "Skipping Compile"
+		)
+		call :log 3 "Booting OS with QEMU."
 		call :boot %os_image%
 
 	:error
