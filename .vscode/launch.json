@@ -5,7 +5,6 @@
             "name": "Debug OS",
             "type": "f5anything",
             "request": "launch",
-            "command": "${workspaceFolder}/build.bat",
+            "command": "${workspaceFolder}/build/build.ps1",
         }
     ]
-}

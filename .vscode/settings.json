@@ -1,0 +1,12 @@
+{
+	"C_Cpp.errorSquiggles": "enabled",
+	"files.associations": {
+		"*.json.liquid": "json",
+		"*.yaml.liquid": "yaml",
+		"*.md.liquid": "markdown",
+		"*.js.liquid": "liquid-javascript",
+		"*.css.liquid": "liquid-css",
+		"*.scss.liquid": "liquid-scss",
+		"mailbox.h": "c"
+	}
+}

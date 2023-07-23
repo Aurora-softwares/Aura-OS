@@ -1,6 +1,1 @@
-/tmp/*
-!/tmp/.gitignore
-/out/*
-!/out/.gitignore
-/iso/*
-!/iso/.gitignore
+/build/object/*

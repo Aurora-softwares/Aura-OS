@@ -1,0 +1,187 @@
+===============
+Getting Started
+===============
+1) Download gcc-arm-none-eabi cross compiler from developer.arm.com
+2) Download qemu-system-arm for quick testing purposes
+3) Copy code from OSdev page on raspberry pi barebones
+4) Put their build instructions in makefile
+
+
+================================
+Understanding the barebones code
+================================
+1) boot.S
+    a) _start is where control is handed off from the bootloader to the kernel
+    b) It sets up the stack pointer
+    c) Sets up the BSS segment (C global veriables)
+        i)   __bss_start and __bss_end are defined in the linker script
+        ii)  label 1 stores 16 bytes of zeros at a time into the bss segment
+        iii) label 2 loops this operation until the whole BSS segment is zeroed
+    d) Jumps to the kernel_main function
+
+2) kernel.c
+    a) UART is a hardware thing in the raspi cpu. It will let us do IO
+        i)   It is "memory mapped", so all interactions go through memory.  The memory segment we will interact with starts at some hardcoded magic number
+            1) That magic number is actually a base address for all peripherals plus a magic offset
+        ii)  We interact through registers, which are fixed offsets from the base of the UART memory
+        iii) For now, we only care about the data register (UART0_DR) and the flags register (UART0+FR).  Flags tells us when we can send and recieve data, and data is where we put data to send and read data to recieve
+        iv)  flags at offset 4 tells whether or not uart has data to read, 5 tells whether uart can accpt data from a write
+
+3) linker.ld
+    a) Defines the memory layout of our kernel
+    b) ENTRY(_start) is what tells the linker our _start label in boot.S is the entry point
+    c) The script starts the memory layout at 0x8000, where the bootloader will put the kernel image
+    d) It delcares the .text section, the executable code, with .text.boot from boot.S first, then the rest of the kernel code in .text
+    e) It declares .rodata (constant data, write protected), .data (initialized data) and .bss (uninitialized data)
+    f) Each section is aligned (rounded up) to the nearest 4096, so it fits neatly inside a memory page
+
+
+========
+Building
+========
+1) Compiling boot.S
+    a) -mcpu = cortex-a7: declare the exact model of arm cpu that is being targeted.  Note that this should be "arm1176jzf-s" if compiling for raspi version 1
+    b) -fpic: generate position independent code. idk why its needed? maybe try removing?
+    c) -ffreestanding: Use standard C includes like stdint.h, but not standard library functions
+
+2) Compiling kernel.c
+    a) Similar options, nothing crazy
+
+3) Linking into an image
+    a) -T linker.ld: Specify our linker script to do the linking for our kernel
+    b) -nostdlib: again, we don't have libc here, so we don't want the compiler to assume we do
+
+4) Running
+    a) qemu can emulate rpi2
+    b) to run on real hardware, its a bit of a hassle.  easiest to just take an sd card image of an OS that works, and replace kernel.img with ours
+
+
+=======================
+Setting up the Makefile
+=======================
+1) The kernel boots, but all of the files are scattered all over the place, and the makefile is not going to scale
+
+2) create build, src/kernel and include/kernel directories.  Put boot.S and kernel.c inside src/kernel, put makefile and linker into build
+   directory
+
+3) Change makefile to use variables.  Notably:
+    a) RASPI_MODEL: there are a few differences in the cpu between model 1 and models 2 and 3
+    b) SOURCES, OBJECTS, and INCLUDES: Create a list of all source files and all object files those source files will compile into.  Then we have rules that compile all of the source files into object files
+    c) Now we can just keep adding new source files without worrying about the make file
+
+
+===========================
+Getting basic functionality
+===========================
+1) Since no stdlib, missing a lot of stuff
+
+2) We can just write a bunch of stdlib and stdio functions ourselves
+
+==============
+Dynamic memory
+==============
+1) Having dynamic memory in the kernel is going to be useful, especially if we want dynamic linked list data structures
+2) Need to create a simple malloc and free implimentation
+3) First we need memory to allocate.  k
+    a) Since we are the kernel, we can take whatever memory we want and do whatever we want with it.
+    b) Since the kernel image starts at 0x8000, it seems reasonable to start our heap at 0x100000 (1MB) and give it (1MB) in size.
+    c) Now that we have a big hunk of memory, all we need is a function to divy it up as requested, malloc
+4) We are going to keep track of the memory as a linked list, where each node marks the start of an allocation.
+    a) We will use best fit, meaning we go through the entire list to find a free allocation that is close to the size we want
+    b) If we get something rather large, we will split it up.
+    c) When we free, we will check if we can put allocations back together
+
+========
+HDMI OUT
+========
+1) UART is all well and good, if you have the appopriate setup
+    a) Need a serial to usb/hdmi cable to actually use the setup as it stands right now
+2) I don't have an appropriate setup, need to enable hdmi and usb
+3) The hdmi protocol itself is handled by the gpu.  All we need to do is get access to the "framebuffer" (a region of memory the gpu will just write to the screen)
+4) Talk to gpu using an interface called "mailbox"
+    a) mailbox starts at a certain offset from the peripheral base
+    b) offsets from there are "regisers" of the mailbox
+        i)  one for reading, one for writing, one for status
+        ii) reading/writing into these addresses sends/recieves "mail"
+5) Model 2 and 3 use "property mailbox"
+    a) First need to craft a message
+        i)  Message consists of a size, a code determining whether the message is a request or a response, a list of tags, an empty end tag, and padding to make it 16 byte aligned
+        ii) tags are the individual requests we want to make
+            1) consist of an identifier, a size of its "value buffer" (the space where parameters are passed and results are put), a spot to put a result size, and the value buffer itself.
+            2) Most important for us are setting the screen size, setting the color mode, and getting a pointer to the frame buffer
+    b) Once we create a message, we can send it to the mailbox.
+        i) mail messages have 28 bits of data and 4 bits of channel.
+            1) The channel for property is 8.
+            2) The pointer to the message goes in the data, but only the high 28 bits, so we must right shift our pointer by 4.  the pointer therefore must be 16 byte aligned
+    c) Once we send the message, we can start writing raw pixels to the framebuffer it gave us
+6) Model 1 uses "framebuffer mailbox"
+    a) create a struct where we ask for a specific resolution and depth, and space for bytes per row, pointer to the buffer and a buffer size
+        i)  Again, since mailbox data is 28 bytes, pointer to struct must be 16 byte aligned
+        ii) must add 0x40000000, because GPU sees memory differently than cpu
+    b) After we send the message, it fills out our struct with info that we can use exactly the same as with model 2 and 3
+7) If we want text, we need to render it ourselves
+    a) Someone else was kind enough to write out 8x8 bitmaps of all the ascii characters, so we will use that
+    b) We will render each ascii character pixel by pixel
+    c) having a simple statically allocated array of pixel bitmaps won't work in practice
+        i)  For some reason, the rodata section was getting corrupt when i ran on actual hardware
+        ii) worked around by creating a function that statically allocates the data.  For some reason this fixes it?
+
+==========
+Interrupts
+==========
+1) We want to do a usb keyboard, this requires hardware interrupts
+2) There are 3 kinds of hardware interrupts
+    a) arm specific (aka basic)
+    b) arm and gpu shared
+    c) fast interrupt
+        i) This is handled separately, so we are not gonna worry about it
+3) Hardware interrupts fall under the more broad category of processor exceptions
+    a) Each type of exception needs to have its own specific handler
+        i) irq handler important right now, swi handler important later
+    b) When an exception occurs, the processor loads a certain offset from address 0 into the pc, depending on what type of exception, and executes the instruction there
+        i)  0 is reset, 4 is undefined instruction, 8 is software interrupt, c is prefetch abort handler, 10 is data abort handler, 14 is reserved, 18 is irq, 1c is fiq
+        ii) To write handlers, all we need to do is define c functions to handle each exception, and add compiler attribute so that the compiler knows its an exception handler and generates appropriate prolog and epilog code
+    c) Tricky part is to get the instructions to 0
+        i)  we can't just load the addresses into the program counter, because the assembler makes all of these references relative
+            1) If we move these to 0, they will still be loading an address relative to them, but the address they want is no longer there
+        ii) We need to copy along with it the absolute location of all the addresses of the handlers
+            1) But wait!! the absolute addresses all think that the code starts at address 0, but it starts at 0x8000!, so we must add that 0x8000 in ourselves
+4) Once the exception instructions are copied, we still need to do some setup for hardware interrrupts specifically
+    a) when an irq comes in, the processor changes to irq mode, from whatever mode it was in
+    b) irq mode has its own set of shadow registers, including the stack pointer
+    c) we must initialize this stack pointer so that our stack is not overwriting anything important when we go to irq mode
+5) Now that the exception handlers are all set up, we need to write the irq handler itself
+    a) Need to check which interrupts are pending, can do this through irq peripheral
+    b) interrupts peripheral offset is 0xb000, has following structure
+        i) 24 bytes of pending flags.  each hardware interrupt flips a certain flag
+            1)  The first 4 bytes are basic interrupts
+            2) The next 8 are gpu specific
+                a) Everything we want is going to be in the gpu shared range
+        ii) 4 bytes of fiq control
+        iii) 24 bytes of enable flags
+            1)   set to 1 to enable the interrupt
+            2)  first 8 bytes are for gpu
+            3) next 4 are for arm specific
+        iv) 24 bytes of disable flags
+            1)   set to 1 to disable (dont have to set 0 to enable flag)
+            2)  first 8 for gpu, next 4 for arm
+     c) use this to find which interrupt is waiting and call the appropriate handler
+6) need to enable interrupts
+    a) use cps instruction
+    b) ie modifier means interrupts enabled, id means disabled
+    c) i argument means enable irqs, as opposed to f for fiqs
+7) Need something to interrupt us!
+    a) usb is hard, so we will use the system timer
+        i) System timer always runs in the background, and we can set it to interrupt us after a certain time
+    b) timer peripheral offset is 0x3000
+        i) control register, for checking and clearing interrupt status of timers
+        ii) low and high timer registers
+            a) timer is 64 bit, need two registers to hold it
+            b) timer is 1Mhz, so low register increases once ever microsecond
+        iii) 4 compare registers
+            a) low timer is compared to all 4 compare registers every tick.
+            b) if match, then interrupt
+    c) First we define an interrupt handler and register it with the irq handler
+    d) Then we set the timer to go off, and wait
+
+
