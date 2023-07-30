@@ -9,7 +9,7 @@
 			"type": "f5anything",
 			"request": "launch",
 			"command": "wsl make kernel",
-			"terminalName": "F5 Anything",
+			"terminalName": "Build the OS",
 			"terminalIndex": -1,
 			"showTerminal": true,
 			"vscCommand": ""
@@ -18,28 +18,33 @@
 			"type": "f5anything",
 			"request": "launch",
 			"command": "wsl make iso",
-			"terminalName": "F5 Anything",
+			"terminalName": "Compile the ISO file",
 			"terminalIndex": -1,
 			"showTerminal": true,
-			"vscCommand": ""
 		}, {
 			"name": "WSL - Clean",
 			"type": "f5anything",
 			"request": "launch",
 			"command": "wsl make clean",
-			"terminalName": "F5 Anything",
+			"terminalName": "Clean all files",
 			"terminalIndex": -1,
 			"showTerminal": true,
-			"vscCommand": ""
+		}, {
+			"name": "WSL - Clear",
+			"type": "f5anything",
+			"request": "launch",
+			"command": "wsl make clean",
+			"terminalName": "Clear all temp files",
+			"terminalIndex": -1,
+			"showTerminal": true,
 		}, {
 			"name": "Windows - Launch",
 			"type": "f5anything",
 			"request": "launch",
 			"command": "$version = Get-Content -Raw -Path 'VERSION'; & qemu-system-x86_64 -cdrom \"./out/iso/AuraOS-$version.iso\"",
-			"terminalName": "F5 Anything",
+			"terminalName": "Launch the OS - QEMU",
 			"terminalIndex": -1,
 			"showTerminal": true,
-			"vscCommand": ""
 		},
 	]
 }
