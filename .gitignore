@@ -1,4 +1,4 @@
-/tmp/*
-!/tmp/.gitignore
-/out/*
-!/out/.gitignore
+*~
+*.d
+*.o
+out

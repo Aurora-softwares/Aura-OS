@@ -1,11 +1,45 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Debug OS",
-            "type": "f5anything",
-            "request": "launch",
-            "command": "${workspaceFolder}/build.bat",
-        }
-    ]
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "WSL - Build",
+			"type": "f5anything",
+			"request": "launch",
+			"command": "wsl make kernel",
+			"terminalName": "F5 Anything",
+			"terminalIndex": -1,
+			"showTerminal": true,
+			"vscCommand": ""
+		}, {
+			"name": "WSL - ISO",
+			"type": "f5anything",
+			"request": "launch",
+			"command": "wsl make iso",
+			"terminalName": "F5 Anything",
+			"terminalIndex": -1,
+			"showTerminal": true,
+			"vscCommand": ""
+		}, {
+			"name": "WSL - Clean",
+			"type": "f5anything",
+			"request": "launch",
+			"command": "wsl make clean",
+			"terminalName": "F5 Anything",
+			"terminalIndex": -1,
+			"showTerminal": true,
+			"vscCommand": ""
+		}, {
+			"name": "Windows - Launch",
+			"type": "f5anything",
+			"request": "launch",
+			"command": "$version = Get-Content -Raw -Path 'VERSION'; & qemu-system-x86_64 -cdrom \"./out/iso/AuraOS-$version.iso\"",
+			"terminalName": "F5 Anything",
+			"terminalIndex": -1,
+			"showTerminal": true,
+			"vscCommand": ""
+		},
+	]
 }
