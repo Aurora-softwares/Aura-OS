@@ -17,7 +17,14 @@ static void print(char *str) {
 void kernel_init() {
 
     // Example code: Print a message to the screen
-    print("Welcome to Aura OS! I am currently on version 0.0.1 - This is just a test.      Screen Resolution is 80x25.                                                                                                                                     AURA A:>");
+    print(
+		"Welcome to Aura OS! I am currently on version 0.0.1                             "
+		"Screen Resolution is 80x25.                                                     "
+		"Example Terminal Ideas.                                                         "
+		"AURA A:>                                                                        "
+		"AURA ALPHA:>                                                                    "
+		"AURA 1:>                                                                        "
+	);
 	kernel_main();
 }
 
