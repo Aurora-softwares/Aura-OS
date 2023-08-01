@@ -20,6 +20,7 @@ void kernel_init() {
     print(
 		"Welcome to Aura OS! I am currently on version 0.0.1                             "
 		"Screen Resolution is 80x25.                                                     "
+		"                                                                                "
 		"Example Terminal Ideas.                                                         "
 		"AURA A:>                                                                        "
 		"AURA ALPHA:>                                                                    "
