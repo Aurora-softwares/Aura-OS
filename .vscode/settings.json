@@ -6,6 +6,20 @@
 		"*.js.liquid": "liquid-javascript",
 		"*.css.liquid": "liquid-css",
 		"*.scss.liquid": "liquid-scss",
-		"stdint.h": "c"
+		"stdint.h": "c",
+		"regex": "c",
+		"*.tcc": "c",
+		"charconv": "c",
+		"chrono": "c",
+		"expected": "c",
+		"optional": "c",
+		"format": "c",
+		"ratio": "c",
+		"system_error": "c",
+		"array": "c",
+		"functional": "c",
+		"tuple": "c",
+		"type_traits": "c",
+		"utility": "c"
 	}
 }
