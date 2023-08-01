@@ -16,7 +16,15 @@
 			"idt.h": "c",
 			"stdlib.h": "c",
 			"kbd_interrupt.h": "c",
-			"concat.h": "c"
+			"concat.h": "c",
+			"features.h": "c",
+			"features-time64.h": "c",
+			"stdc-predef.h": "c",
+			"sstream": "c",
+			"stddef.h": "c",
+			"cdefs.h": "c",
+			"wordsize.h": "c",
+			"long-double.h": "c"
 		}
 	}
 }

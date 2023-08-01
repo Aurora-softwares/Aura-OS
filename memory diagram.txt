@@ -1,0 +1,5 @@
+
+0x0                    4M                    0x400000    0x401000
+| .boottext | .bootrodata | .bootdata | .bootbss | //1K// | .text | //1K// | .rodata | //1K// | .data | //1K// | .bss | //1K// | 
+|---------------------------------------------------------|-----------------------------------------------------------|--------|
+kernel physical start                       kernel virtual start & boot end                             kernel virtual end    kernelphysical end
