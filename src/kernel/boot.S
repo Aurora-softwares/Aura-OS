@@ -9,7 +9,6 @@
 .SET HEADER_LENGTH, header_end - header_start
 .SET CHECKSUM, -(MULTIBOOT2_HEADER_MAGIC + MULTIBOOT_ARCHITECTURE_I386 + HEADER_LENGTH)
 .section .multiboot
-
 header_start:
 	.long MULTIBOOT2_HEADER_MAGIC		// Magic value to identify Multiboot2 header
 	.long MULTIBOOT_ARCHITECTURE_I386	// Architecture tag (for x86, use I386)
@@ -33,8 +32,7 @@ header_end:
 .comm low_page_directory_table, PAGE_DIRECTORY_SIZE, PAGE_DIRECTORY_ALIGNMENT
 .comm high_page_directory_table, PAGE_DIRECTORY_SIZE, PAGE_DIRECTORY_ALIGNMENT
 .comm tmp_stack, KERNEL_BOOT_STACK_SIZE, KERNEL_BOOT_STACK_ALIGNMENT
-
-.data
+.section .data
 .align GDT_TABLE_ALIGNMENT
 gdt_table:
 	.8byte GDT_FIRST_ENTRY		// GDT entry for the first segment (unused)
