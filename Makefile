@@ -21,14 +21,14 @@ all: kernel
 kernel:
 	make -C src/kernel all
 
-iso: kernel
+iso:
 	mkdir -p out/iso/
 	mkdir -p out/raw/boot/grub/
 	cp grub.cfg out/raw/boot/grub/
 	cp src/kernel/kernel out/raw/boot/
 	$(GRUB_MKRESCUE) -o ./out/iso/$(ISO_FILE) ./out/raw
 
-qemu: iso
+qemu:
 	qemu-system-x86_64 -cdrom ./out/iso/$(ISO_FILE) -serial stdio -m 1024M
 
 clear:

@@ -1,28 +1,8 @@
 {
-	// Use IntelliSense to learn about possible attributes.
-	// Hover to view descriptions of existing attributes.
-	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 	"version": "0.2.0",
 	"configurations": [
-		{
-			"name": "WSL - Build",
-			"type": "f5anything",
-			"request": "launch",
-			"command": "wsl make kernel",
-			"terminalName": "Build the OS",
-			"terminalIndex": -1,
-			"showTerminal": true,
-			"vscCommand": ""
-		}, {
-			"name": "WSL - ISO",
-			"type": "f5anything",
-			"request": "launch",
-			"command": "wsl make iso",
-			"terminalName": "Compile the ISO file",
-			"terminalIndex": -1,
-			"showTerminal": true,
-		}, {
-			"name": "WSL - Clean",
+		{	
+			"name": "Clean",
 			"type": "f5anything",
 			"request": "launch",
 			"command": "wsl make clean",
@@ -30,7 +10,7 @@
 			"terminalIndex": -1,
 			"showTerminal": true,
 		}, {
-			"name": "WSL - Clear",
+			"name": "Clear",
 			"type": "f5anything",
 			"request": "launch",
 			"command": "wsl make clean",
@@ -38,15 +18,35 @@
 			"terminalIndex": -1,
 			"showTerminal": true,
 		}, {
-			"name": "Win - Launch",
+			"name": "Compile",
 			"type": "f5anything",
 			"request": "launch",
-			"command": "$version = Get-Content -Raw -Path 'VERSION'; & qemu-system-x86_64  -nographic -m 4G -smp 2 -vga qxl -cdrom \"./out/iso/AuraOS-$version.iso\"",
-			"terminalName": "Launch the OS - QEMU",
+			"command": "wsl make kernel",
+			"terminalName": "Compile the OS",
+			"terminalIndex": -1,
+			"showTerminal": true,
+			"vscCommand": ""
+		}, {
+			"name": "Build",
+			"type": "f5anything",
+			"request": "launch",
+			"command": "wsl make iso",
+			"terminalName": "Build the ISO file",
 			"terminalIndex": -1,
 			"showTerminal": true,
 		}, {
-			"name": "Win - FULL",
+			"name": "Launch",
+			"type": "f5anything",
+			"request": "launch",
+			"command": "$version = Get-Content -Raw -Path 'VERSION'; & qemu-system-x86_64 -m 4G -smp 2 -vga qxl -cdrom \"./out/iso/AuraOS-$version.iso\"",
+			"terminalName": "Launch the OS - QEMU",
+			"terminalIndex": -1,
+			"showTerminal": true,
+		},
+		
+		
+		{
+			"name": "COMPLETE",
 			"type": "f5anything",
 			"request": "launch",
 			"command": "clear ; wsl make clean ; wsl make kernel ; wsl make iso ; $version = Get-Content -Raw -Path 'VERSION'; & qemu-system-x86_64 -m 4G -smp 2 -vga qxl -cdrom \"./out/iso/AuraOS-$version.iso\"",
