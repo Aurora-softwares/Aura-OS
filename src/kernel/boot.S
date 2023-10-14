@@ -1,8 +1,8 @@
 #include "arch/x86_64/gdt.h"
 #include "arch/x86_64/mmu.h"
 #include "kernel.h"
-#include "sizes.h"
-#include "multiboot2.h"
+#include "arch/x86_64/sizes.h"
+#include "arch/x86_64/multiboot2.h"
 #include "arch/x86_64/msr.h"
 
 // Define the length and checksum for the Multiboot2 header

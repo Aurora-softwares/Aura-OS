@@ -5,9 +5,10 @@ ASFLAGS = $(SHARED_FLAGS) -Wa,--divide
 
 OBJS := boot.o
 OBJS += assembly.o
-OBJS += kernel.o
 OBJS += keyboard.o
 OBJS += screen.o
+OBJS += hid.o
+OBJS += kernel.o
 
 DFILES = $(patsubst %.o,%.d,$(OBJS))
 

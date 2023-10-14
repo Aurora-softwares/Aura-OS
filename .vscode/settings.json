@@ -23,6 +23,11 @@
 		"utility": "c",
 		"pthread.h": "c",
 		"cstdint": "cpp",
-		"assembly.h": "c"
+		"assembly.h": "c",
+		"keyboard.h": "c",
+		"screen.h": "c",
+		"idt.h": "c",
+		"compare": "c",
+		"hid.h": "c"
 	}
 }

@@ -1,4 +1,5 @@
 *~
-*.d
-*.o
+src/kernel/*.d
+src/kernel/*.o
 out
+src/kernel/kernel
