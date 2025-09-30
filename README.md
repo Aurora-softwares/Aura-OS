@@ -55,3 +55,44 @@ Once you clone the repository to build the OS, it is as easy as opening it in VS
 # Licence
 
 Please observe the Apache 2.0 license that is listed in this repository. In addition, the Lightning framework is Patent Pending.
+## Roadmap: USB, Video, and Shell Overhaul
+
+> **Status:** These features are currently under active development on the
+> `feature/usb-video-shell` branch. The codebase does not yet include a USB host
+> stack, native-resolution video pipeline, or interactive shell. The sections
+> below capture the intended workflow once the implementation is complete.
+
+### Building (planned)
+- `make qemu-bios` – build a BIOS-compatible image targeting legacy VBE modes.
+- `make qemu-uefi` – build an image that boots under OVMF/UEFI using GOP.
+
+### Running in QEMU (planned)
+```bash
+# BIOS boot (planned)
+qemu-system-x86_64 -m 512 -enable-kvm -d int -no-reboot \
+  -drive format=raw,file=build/aura-bios.img \
+  -device usb-kbd
+
+# UEFI boot (planned)
+qemu-system-x86_64 -m 512 -enable-kvm -d int -no-reboot \
+  -drive if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE.fd \
+  -drive if=pflash,format=raw,file=build/ovmf_vars.fd \
+  -drive format=raw,file=build/aura-uefi.img \
+  -device usb-kbd
+```
+
+### Shell test flow (planned)
+Once the shell is implemented, the following commands will be available on the
+primary console:
+
+| Command  | Description |
+|----------|-------------|
+| `help`   | List all registered commands with a short synopsis. |
+| `echo`   | Echo the supplied text back to the console. |
+| `cls`/`clear` | Clear the framebuffer console. |
+| `reboot` | Trigger a warm reboot. |
+| `meminfo`| Show basic memory usage statistics. |
+| `lsusb`  | Display detected USB devices in `bus:addr vendor:product class` format. |
+| `vidinfo`| Print the current video mode. |
+
+Refer to `tests/manual.md` for the full manual validation checklist.
