@@ -14,9 +14,12 @@ REM VARIABLES
 		set dir_out=.\out\
 		set dir_iso=.\iso\
 	: File names
-		set kernel_src=%dir_src%kernel.c
+		set kernel_src=%dir_src%kernel.asm
+		set kernel_cpp_src=%dir_src%kernel.cpp
+		set kernel_cpp_obj=%dir_tmp%kernel.o
+		set kernel_cpp_bin=%dir_tmp%kernel_cpp.bin
 		set kernel_out=%dir_out%kernel.bin
-		set bootloader_src=%dir_src%bootloader.c
+		set bootloader_src=%dir_src%bootloader.asm
 		set bootloader_out=%dir_out%bootloader.bin
 		set os_image=%dir_iso%%os_name%-%os_version%.bin
 	: MISC
@@ -92,10 +95,13 @@ REM PROGRAM
 		goto parse_args
 	:main
 		if not defined no_compile (
-			call :log 3 "Compiling the bootloader."
-			call :compile_c %bootloader_out% %bootloader_src%
-			call :log 3 "Compiling the kernel."
-			call :compile_c %kernel_out% %kernel_src%
+		call :log 3 "Compiling the bootloader."
+		call :compile_asm %bootloader_out% %bootloader_src%
+		call :log 3 "Compiling the C++ kernel stage."
+		.\bin\mingw64-11.2.0\bin\x86_64-w64-mingw32-g++.exe -m16 -ffreestanding -fno-exceptions -fno-rtti -nostdlib -fno-stack-protector -fno-asynchronous-unwind-tables -fno-unwind-tables -Os -c %kernel_cpp_src% -o %kernel_cpp_obj%
+		.\bin\mingw64-11.2.0\bin\objcopy.exe -O binary --only-section=.text %kernel_cpp_obj% %kernel_cpp_bin%
+		call :log 3 "Compiling the kernel."
+		call :compile_asm %kernel_out% %kernel_src%
 			call :log 3 "Combining the bootloader and Kernel bin files."
 			call :combine_bin %bootloader_out% %kernel_out% %os_image%
 		) else (
