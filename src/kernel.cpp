@@ -8,8 +8,10 @@ static inline __attribute__((always_inline)) void print_welcome();
 static inline __attribute__((always_inline)) void print_prompt();
 static inline __attribute__((always_inline)) void print_bar();
 static inline __attribute__((always_inline)) void print_unknown();
+static inline void bios_clear_screen();
 
 extern "C" void kernel_main() {
+    bios_clear_screen();
     print_welcome();
 
     for (;;) {
@@ -76,6 +78,26 @@ static inline void bios_newline() {
     bios_print_char('\n');
 }
 
+static inline void bios_clear_screen() {
+    asm volatile (
+        "int $0x10\n"
+        :
+        : "a"(static_cast<uint16_t>(0x0600)),
+          "b"(static_cast<uint16_t>(0x0700)),
+          "c"(static_cast<uint16_t>(0x0000)),
+          "d"(static_cast<uint16_t>(0x184F))
+        : "cc"
+    );
+    asm volatile (
+        "int $0x10\n"
+        :
+        : "a"(static_cast<uint16_t>(0x0200)),
+          "b"(static_cast<uint16_t>(0x0000)),
+          "d"(static_cast<uint16_t>(0x0000))
+        : "cc"
+    );
+}
+
 static inline char bios_read_char() {
     uint16_t ax;
     asm volatile (
@@ -89,13 +111,11 @@ static inline char bios_read_char() {
 }
 
 static inline __attribute__((always_inline)) void print_welcome() {
-    bios_print_char('W');
+    bios_print_char('h');
     bios_print_char('e');
     bios_print_char('l');
-    bios_print_char('c');
+    bios_print_char('l');
     bios_print_char('o');
-    bios_print_char('m');
-    bios_print_char('e');
     bios_newline();
 }
 
