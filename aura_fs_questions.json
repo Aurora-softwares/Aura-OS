@@ -1,0 +1,74 @@
+{
+  "_instructions": "Answer the values on the right. Keep keys intact. Options in parentheses are suggestions — pick one, or enter a specific value.",
+  "_goal": "Design inputs for a simple, journal-capable filesystem for Aura-OS on a raw 256MB QEMU disk.",
+
+  "Filesystem name?": "AuraFS",
+  "Magic identifier (ASCII or hex)?": "AURA",
+  "Version (major.minor)?": "0.1",
+  "Endianness? (little|big)": "little",
+
+  "Fixed: block size (bytes)?": 4096,
+  "Fixed: fragment size (bytes)?": 4096,
+  "Sector size (bytes, physical disk)?": 512,
+
+  "Addressing unit? (block|byte)": "block",
+  "Block addressing width (bits)? (32|64)": 64,
+  "Max volume size target (MB)?": 256,
+  "Max file size (bytes)?": 1125899906842624,
+
+  "Root file index present? (yes/no)": "yes",
+  "Root index type? (table|btree|hash)": "table",
+  "Directory structure? (flat|btree|hash)": "flat",
+  "Max filename length (bytes)?": 255,
+  "Filename encoding? (ascii|utf-8)": "utf-8",
+  "Case handling? (sensitive|insensitive|preserve_insensitive)": "preserve_insensitive",
+
+  "Inode model? (inode_table|fat_like|extent_only)": "inode_table",
+  "Allocation tracking? (bitmap|free_list|buddy)": "bitmap",
+  "Allocation policy? (first_fit|next_fit|best_fit)": "next_fit",
+  "Extent support? (yes/no)": "yes",
+  "Sparse files supported? (yes/no)": "no",
+
+  "Enable permissions? (yes/no)": "yes",
+  "Permissions model? (posix|acl|custom)": "posix",
+  "User ID width (bits)?": 16,
+  "Group ID width (bits)?": 16,
+  "Root owner uid:gid?": "0:0",
+  "Default file mode (octal)?": "0644",
+  "Default dir mode (octal)?": "0755",
+
+  "Timestamps stored? (ctime,mtime,atime)": "ctime,mtime",
+  "Timestamp epoch? (unix|custom)": "unix",
+  "Timezone handling? (utc|local|unspecified)": "utc",
+
+  "Enable journaling? (yes/no)": "yes",
+  "Journaling mode? (metadata|ordered|full)": "metadata",
+  "Journal record type? (intent_log|redo|undo|redo_undo)": "redo",
+  "Journal location? (inline|end|separate_region)": "separate_region",
+  "Journal size (blocks)?": 1024,
+  "Journal checksum? (none|crc32|xxhash)": "crc32",
+  "Minimum journal commit interval (ms)?": 0,
+  "Journal barrier/flush on commit? (yes/no)": "yes",
+  "On crash, replay at mount? (yes/no)": "yes",
+
+  "Superblock location? (block number)": 0,
+  "Backup superblocks at blocks (comma list)?": "64,8192,16384",
+  "Boot region reserved blocks (start..end)?": "0..0",
+  "Metadata checksum? (none|crc32)": "crc32",
+  "Data checksum? (none|crc32|xxhash)": "none",
+
+  "Compression? (none|lz4|deflate)": "none",
+  "Encryption? (none|xchacha20|aes)": "none",
+
+  "Hard links supported? (yes/no)": "no",
+  "Symlinks supported? (yes/no)": "no",
+
+  "Bad block table? (none|static|dynamic)": "none",
+  "Mount options default? (read_only|read_write)": "read_write",
+  "Max open files (target)?": 128,
+
+  "Build target for prototype? (raw_disk|within_partition)": "raw_disk",
+  "Partitioning scheme? (none|mbr|gpt)": "none",
+
+  "Notes or constraints to honor?": "Design favors a centralized inode table with UTF-8 filenames stored as variable-length bytes (offset+length) to allow dynamic names; case is preserved but lookup is case-insensitive (normalize at compare). Bitmap + next-fit + small inline extents minimize fragmentation and keep code simple. Journaling is metadata-only in a separate region to avoid interfering with data layout. Superblock at block 0 with multiple backups. Values chosen to be future-proof (64-bit block addressing, large max file size) but still practical for a 256MB QEMU image."
+}
