@@ -68,7 +68,7 @@ REM FUNCTIONS
 		copy /b %1+%2 %3
 		exit /B 0
 	:boot
-		.\bin\qemu-8.0.0\qemu-system-x86_64.exe -drive file=%1,format=raw,if=ide -boot c -m 64M
+		.\bin\qemu-8.0.0\qemu-system-x86_64.exe -drive file=%1,format=raw,if=ide -boot c -m 64M -serial stdio
 		exit /B 0
 	:log
 		for /f "skip=1 delims=" %%d in ('wmic os get localdatetime') do set datetime=%%d
@@ -76,17 +76,17 @@ REM FUNCTIONS
 		set "time=%datetime:~8,6%"
 		set "formatted_datetime=%date:~0,4%%date:~4,2%%date:~8,2% %time:~0,2%:%time:~3,2%:%time:~6,2%"
 		if %1==1 (
-			echo [36m[TRACE] [%formatted_datetime%] %2 [0m
+			echo [TRACE] [%formatted_datetime%] %2
 		) else if %1==2 (
-			echo [96m[DEBUG] [%formatted_datetime%] %2 [0m
+			echo [DEBUG] [%formatted_datetime%] %2
 		) else if %1==3 (
-			echo [92m[ INFO] [%formatted_datetime%] %2 [0m
+			echo [ INFO] [%formatted_datetime%] %2
 		) else if %1==4 (
-			echo [93m[ WARN] [%formatted_datetime%] %2 [0m
+			echo [ WARN] [%formatted_datetime%] %2
 		) else if %1==5 (
-			echo [91m[ERROR] [%formatted_datetime%] %2 [0m
+			echo [ERROR] [%formatted_datetime%] %2
 		) else if %1==5 (
-			echo [107;91m[FATAL] [%formatted_datetime%] %2 [0m
+			echo [FATAL] [%formatted_datetime%] %2
 		)
 		exit /B 0
 REM PROGRAM
