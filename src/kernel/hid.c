@@ -1,5 +1,58 @@
 #include "hid.h"
 
+#include <stddef.h>
+
+static void hid_format_hex(uint32_t value, char *buffer, size_t buffer_len) {
+    const char *digits = "0123456789ABCDEF";
+    const size_t required = 8;
+
+    if (buffer_len <= required) {
+        if (buffer_len > 0) {
+            buffer[0] = '\0';
+        }
+        return;
+    }
+
+    for (size_t i = 0; i < required; ++i) {
+        buffer[required - 1 - i] = digits[value & 0x0F];
+        value >>= 4;
+    }
+
+    buffer[required] = '\0';
+}
+
+static void hid_format_uint(uint32_t value, char *buffer, size_t buffer_len) {
+    if (buffer_len == 0) {
+        return;
+    }
+
+    size_t index = 0;
+    if (value == 0) {
+        if (buffer_len > 1) {
+            buffer[0] = '0';
+            buffer[1] = '\0';
+        } else {
+            buffer[0] = '\0';
+        }
+        return;
+    }
+
+    while (value > 0 && index + 1 < buffer_len) {
+        buffer[index++] = (char)('0' + (value % 10));
+        value /= 10;
+    }
+
+    if (index < buffer_len) {
+        buffer[index] = '\0';
+    }
+
+    for (size_t i = 0; i < index / 2; ++i) {
+        char tmp = buffer[i];
+        buffer[i] = buffer[index - 1 - i];
+        buffer[index - 1 - i] = tmp;
+    }
+}
+
 // Function to read a 32-bit word from the PCI configuration space
 uint32_t pci_config_read_word(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset) {
 	uint32_t address = 0x80000000 | (bus << 16) | (slot << 11) | (func << 8) | (offset & 0xFC);
@@ -101,10 +154,11 @@ void xhci_init(pci_address_t controller_address) {
 	// 3. Enable interrupts for xHCI
 
 	// For this example, let's just print the base address of the xHCI registers
-	print("xHCI Base Address: ");
-	char str[17]; // Buffer to hold the hexadecimal representation of the base address
-	snprintf(str, sizeof(str), "%016lX", (unsigned long)xhci_base_address);
-	print(str);
+        print("xHCI Base Address: ");
+        char str[11];
+        hid_format_hex(xhci_base_address, str, sizeof(str));
+        print("0x");
+        print(str);
 }
 
 // Function to enumerate USB devices and identify HID devices
@@ -125,8 +179,8 @@ void usb_enumerate_devices(pci_address_t controller_address) {
 
             // Print information about the connected device
             print("Connected USB device on Port ");
-            char port_num_str[3];
-            snprintf(port_num_str, sizeof(port_num_str), "%u", port + 1);
+            char port_num_str[4];
+            hid_format_uint((uint32_t)(port + 1), port_num_str, sizeof(port_num_str));
             print(port_num_str);
 
             if (speed == XHCI_PORTSC_SPEED_SUPER) {
