@@ -2,11 +2,11 @@
 #define KEYBOARD_H
 
 #include <stdint.h>
-#include <stdio.h>
+#include "keyboard.h"
 #include "assembly.h"
-#include "screen.h"
 
-void keyboard_init();
 void keyboard_interrupt_handler();
+void keyboard_init();
+char read_char();
 
 #endif // KEYBOARD_H

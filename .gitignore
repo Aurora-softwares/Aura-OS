@@ -1,5 +1,4 @@
 *~
-src/kernel/*.d
-src/kernel/*.o
+*.d
+*.o
 out
-src/kernel/kernel

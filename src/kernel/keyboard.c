@@ -1,5 +1,8 @@
 #include "keyboard.h"
 
+#include <stdint.h>
+#include "assembly.h"
+
 void keyboard_init() {
     // Wait for the input buffer to be empty
     uint8_t status;
@@ -26,7 +29,3 @@ void keyboard_init() {
     // and then the desired LED state (bit 0 for Scroll Lock, bit 1 for Num Lock, bit 2 for Caps Lock).
     // ...
 }
-void keyboard_interrupt_handler() {
-	print("Key pressed\n");
-}
-
