@@ -4,7 +4,6 @@ ISO_FILE=$(OS_NAME)-$(OS_VERSION).iso
 
 .PHONY: all
 .PHONY: kernel
-.PHONY: qemu
 .PHONY: iso
 .PHONY: clean
 
@@ -18,6 +17,12 @@ endif
 
 all: kernel
 
+clear:
+	make -C src/kernel clean
+
+clean: clear
+	rm -rf out/
+
 kernel:
 	make -C src/kernel all
 
@@ -27,12 +32,3 @@ iso:
 	cp grub.cfg out/raw/boot/grub/
 	cp src/kernel/kernel out/raw/boot/
 	$(GRUB_MKRESCUE) -o ./out/iso/$(ISO_FILE) ./out/raw
-
-qemu:
-	qemu-system-x86_64 -cdrom ./out/iso/$(ISO_FILE) -serial stdio -m 1024M
-
-clear:
-	make -C src/kernel clean
-
-clean: clear
-	rm -rf out/

@@ -1,20 +1,13 @@
 {
 	"version": "0.2.0",
 	"configurations": [
+
 		{	
 			"name": "Clean",
 			"type": "f5anything",
 			"request": "launch",
 			"command": "wsl make clean",
 			"terminalName": "Clean all files",
-			"terminalIndex": -1,
-			"showTerminal": true,
-		}, {
-			"name": "Clear",
-			"type": "f5anything",
-			"request": "launch",
-			"command": "wsl make clean",
-			"terminalName": "Clear all temp files",
 			"terminalIndex": -1,
 			"showTerminal": true,
 		}, {
@@ -38,7 +31,7 @@
 			"name": "Launch",
 			"type": "f5anything",
 			"request": "launch",
-			"command": "$version = Get-Content -Raw -Path 'VERSION'; & qemu-system-x86_64 -m 4G -smp 2 -vga qxl -cdrom \"./out/iso/AuraOS-$version.iso\"",
+			"command": "$version = Get-Content -Raw -Path 'VERSION'; & qemu-system-x86_64 -m 4G -smp 2 -vga qxl -serial stdio -cdrom \"./out/iso/AuraOS-$version.iso\"",
 			"terminalName": "Launch the OS - QEMU",
 			"terminalIndex": -1,
 			"showTerminal": true,
@@ -49,7 +42,7 @@
 			"name": "COMPLETE",
 			"type": "f5anything",
 			"request": "launch",
-			"command": "clear ; wsl make clean ; wsl make kernel ; wsl make iso ; $version = Get-Content -Raw -Path 'VERSION'; & qemu-system-x86_64 -m 4G -smp 2 -vga qxl -cdrom \"./out/iso/AuraOS-$version.iso\"",
+			"command": "clear ; wsl make clean ; wsl make kernel ; wsl make iso ; $version = Get-Content -Raw -Path 'VERSION'; & qemu-system-x86_64 -m 4G -smp 2 -vga qxl -serial stdio -cdrom \"./out/iso/AuraOS-$version.iso\"",
 			"terminalName": "Launch the OS - QEMU",
 			"terminalIndex": -1,
 			"showTerminal": true,

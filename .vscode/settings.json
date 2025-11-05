@@ -23,6 +23,9 @@
 		"utility": "c",
 		"pthread.h": "c",
 		"cstdint": "cpp",
-		"assembly.h": "c"
+		"assembly.h": "c",
+		"screen.h": "c",
+		"serial.h": "c",
+		"keyboard.h": "c"
 	}
 }

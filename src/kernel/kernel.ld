@@ -28,22 +28,28 @@ SECTIONS {
 	.text : AT( _boot_end ) {
 		*(.multiboot)
 		*(.text)
+		*(.text.*)
 	}
 
-	. = ALIGN(4);
+	. = ALIGN(0x1000);
 	.rodata : AT ( (LOADADDR (.text) + SIZEOF (.text) + 0xFFF) & 0xFFFFFFFFFFFFF000 ) {
 		*(.rodata)
+		*(.rodata.*)
+		*(.rdata)
+		*(.rdata.*)
 	}
 
-	. = ALIGN(4);
+	. = ALIGN(0x1000);
 	.data : AT ( (LOADADDR (.rodata) + SIZEOF (.rodata) + 0xFFF) & 0xFFFFFFFFFFFFF000 ) {
 		*(.data)
+		*(.data.*)
 	}
 
-	. = ALIGN(4);
+	. = ALIGN(0x1000);
 	.bss : AT ( (LOADADDR (.data) + SIZEOF (.data) + 0xFFF) & 0xFFFFFFFFFFFFF000 ) {
 		*(COMMON)
 		*(.bss)
+		*(.bss.*)
 	}
 
 	_kernel_virtual_end = .;
