@@ -1,6 +1,7 @@
 #ifndef PCI_H
 #define PCI_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -20,5 +21,7 @@ uint16_t pci_config_read16(uint8_t bus, uint8_t slot, uint8_t function, uint8_t 
 uint8_t pci_config_read8(uint8_t bus, uint8_t slot, uint8_t function, uint8_t offset);
 void pci_config_write16(uint8_t bus, uint8_t slot, uint8_t function, uint8_t offset, uint16_t value);
 bool pci_find_by_class(uint8_t class_code, uint8_t subclass, uint8_t prog_if, struct pci_device* out_device);
+size_t pci_enumerate_by_class(uint8_t class_code, uint8_t subclass, uint8_t prog_if,
+                              struct pci_device* out_devices, size_t max_count);
 
 #endif // PCI_H

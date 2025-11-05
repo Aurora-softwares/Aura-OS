@@ -1,11 +1,10 @@
 #include "drivers/usb/uhci.h"
 
 #include <stddef.h>
-#include <string.h>
-
 #include "arch/x86_64/kernel.h"
 #include "drivers/pci.h"
 #include "drivers/usb/usb.h"
+#include "libk/string.h"
 #include "libs/serial.h"
 #include "libs/assembly.h"
 
@@ -62,7 +61,7 @@
 #define UHCI_TD_LS            (1 << 26)
 #define UHCI_TD_SPD           (1 << 27)
 
-#define UHCI_PORT_COUNT 2
+#define UHCI_PORT_COUNT UHCI_MAX_PORTS
 
 struct uhci_td {
     uint32_t link_ptr;
@@ -306,7 +305,7 @@ bool uhci_controller_init(const struct pci_device* device) {
     }
 
     g_controller.io_base = io_base;
-    g_controller.active_port = 0xFF;
+    g_controller.active_port = 0;
 
     uhci_reset(&g_controller);
     serial_write("uhci_controller_init: controller reset\n");
@@ -323,18 +322,24 @@ bool uhci_controller_init(const struct pci_device* device) {
     io_write16(g_controller.io_base, UHCI_USBCMD, cmd | UHCI_USBCMD_CF);
     serial_write("uhci_controller_init: host controller run\n");
 
+    uint8_t first_connected = 0xFF;
     for (uint8_t port = 0; port < UHCI_PORT_COUNT; ++port) {
-        if (uhci_reset_port(&g_controller, port)) {
-            g_controller.active_port = port;
-            serial_write("uhci_controller_init: port reset successful\n");
-            break;
+        bool connected = uhci_reset_port(&g_controller, port);
+        if (connected && first_connected == 0xFF) {
+            first_connected = port;
+            serial_write("uhci_controller_init: first connected port found\n");
         }
     }
 
-    controller_ready = (g_controller.active_port != 0xFF);
-    serial_write(controller_ready ? "uhci_controller_init: controller ready\n"
-                                  : "uhci_controller_init: no active port found\n");
-    return controller_ready;
+    if (first_connected != 0xFF) {
+        g_controller.active_port = first_connected;
+        serial_write("uhci_controller_init: controller has an active device\n");
+    } else {
+        serial_write("uhci_controller_init: no active devices, controller idle\n");
+    }
+
+    controller_ready = true;
+    return true;
 }
 
 void uhci_set_address(struct uhci_controller* controller, uint8_t address) {
@@ -407,6 +412,37 @@ bool uhci_control_transfer(struct uhci_controller* controller, uint8_t address, 
 
     control_qh.element_link_ptr = UHCI_LINK_TERMINATE;
     return ok;
+}
+
+void uhci_select_port(struct uhci_controller* controller, uint8_t port_index) {
+    if (!controller || port_index >= UHCI_PORT_COUNT) {
+        serial_write("uhci_select_port: invalid controller or port\n");
+        return;
+    }
+
+    controller->active_port = port_index;
+    serial_write("uhci_select_port: active port set to ");
+    serial_write_uint(port_index);
+    serial_write("\n");
+}
+
+uint8_t uhci_port_count(const struct uhci_controller* controller) {
+    (void)controller;
+    return UHCI_PORT_COUNT;
+}
+
+bool uhci_port_connected(const struct uhci_controller* controller, uint8_t port_index) {
+    if (!controller || port_index >= UHCI_PORT_COUNT) {
+        return false;
+    }
+    return controller->port_connected[port_index];
+}
+
+bool uhci_port_low_speed(const struct uhci_controller* controller, uint8_t port_index) {
+    if (!controller || port_index >= UHCI_PORT_COUNT) {
+        return false;
+    }
+    return controller->port_low_speed[port_index];
 }
 
 bool uhci_interrupt_poll(struct uhci_controller* controller, uint8_t address, struct uhci_interrupt_transfer* transfer) {

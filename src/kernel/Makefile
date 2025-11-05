@@ -6,13 +6,12 @@ ASFLAGS = $(SHARED_FLAGS) -Wa,--divide
 OBJS := boot.o
 OBJS += assembly.o
 OBJS += kernel.o
-OBJS += keyboard.o
 OBJS += screen.o
 OBJS += serial.o
 OBJS += libk/string.o
 OBJS += drivers/pci.o
 OBJS += drivers/usb/uhci.o
-OBJS += drivers/usb/usb_keyboard.o
+OBJS += drivers/usb/usb_core.o
 
 DFILES = $(patsubst %.o,%.d,$(OBJS))
 

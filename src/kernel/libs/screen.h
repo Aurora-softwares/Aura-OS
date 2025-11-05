@@ -2,7 +2,6 @@
 #define SCREEN_H
 
 #include <stdint.h>
-#include "keyboard.h"
 #include "assembly.h"
 
 void setCursorAppearance();

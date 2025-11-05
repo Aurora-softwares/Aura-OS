@@ -55,4 +55,12 @@ SECTIONS {
 	_kernel_virtual_end = .;
 
 	_kernel_physical_end = (LOADADDR (.bss) + SIZEOF (.bss) + 0xFFF) & 0xFFFFFFFFFFFFF000;
+
+	/DISCARD/ : {
+		*(.eh_frame)
+		*(.eh_frame.*)
+		*(.gcc_except_table)
+		*(.gcc_except_table.*)
+		*(.note.GNU-stack)
+	}
 }

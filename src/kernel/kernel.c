@@ -1,8 +1,9 @@
+#include <stdbool.h>
 #include <stdint.h>
 #include "assembly.h"
-#include "keyboard.h"
 #include "serial.h"
 #include "screen.h"
+#include "drivers/usb/usb_core.h"
 
 bool text_mode = true;
 
@@ -27,10 +28,14 @@ void kernel_init() {
 	setCursorAppearance();
 	serial_write("kernel_init: Cursor initialized\n");
 
-	// Initialize Keyboard
-	serial_write("kernel_init: initializing keyboard...\n");
-	keyboard_init();
-	serial_write("kernel_init: keyboard init done\n");
+	// Scan USB topology
+	serial_write("kernel_init: scanning USB controllers...\n");
+	bool usb_ok = usb_init();
+	serial_write(usb_ok ? "kernel_init: USB scan completed\n"
+	                    : "kernel_init: USB scan unavailable\n");
+	serial_write("kernel_init: USB bus count=");
+	serial_write_uint(usb_bus_count());
+	serial_write("\n");
 
 	// Initialize HDMI
 	//serial_write("kernel_init: initializing HDMI...\n");

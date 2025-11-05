@@ -95,3 +95,45 @@ bool pci_find_by_class(uint8_t class_code, uint8_t subclass, uint8_t prog_if, st
     serial_write("pci: find_by_class no match\n");
     return false;
 }
+
+size_t pci_enumerate_by_class(uint8_t class_code, uint8_t subclass, uint8_t prog_if,
+                              struct pci_device* out_devices, size_t max_count) {
+    size_t count = 0;
+    for (uint16_t bus = 0; bus < 256; ++bus) {
+        uint8_t bus_index = (uint8_t)bus;
+        for (uint8_t slot = 0; slot < 32; ++slot) {
+            if (!pci_device_present(bus_index, slot, 0)) {
+                continue;
+            }
+
+            uint8_t header_type = pci_config_read8(bus_index, slot, 0, 0x0E);
+            uint8_t function_count = (header_type & 0x80) ? 8 : 1;
+
+            for (uint8_t function = 0; function < function_count; ++function) {
+                if (!pci_device_present(bus_index, slot, function)) {
+                    continue;
+                }
+
+                uint8_t cc = pci_config_read8(bus_index, slot, function, 0x0B);
+                uint8_t sc = pci_config_read8(bus_index, slot, function, 0x0A);
+                uint8_t pi = pci_config_read8(bus_index, slot, function, 0x09);
+                if (cc == class_code && sc == subclass && (prog_if == 0xFF || pi == prog_if)) {
+                    if (out_devices && count < max_count) {
+                        struct pci_device* out = &out_devices[count];
+                        out->bus = bus_index;
+                        out->slot = slot;
+                        out->function = function;
+                        out->vendor_id = pci_config_read16(bus_index, slot, function, 0x00);
+                        out->device_id = pci_config_read16(bus_index, slot, function, 0x02);
+                        out->class_code = cc;
+                        out->subclass = sc;
+                        out->prog_if = pi;
+                    }
+                    ++count;
+                }
+            }
+        }
+    }
+
+    return count;
+}
